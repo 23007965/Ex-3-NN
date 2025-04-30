@@ -36,7 +36,127 @@ Step 3: Repeat the  iteration  until the losses become constant and  minimum<BR>
 Step 4 : Test for the XOR patterns.
 
 <H3>Program:</H3>
-Insert your code here
+```PYTHON
+import numpy as np
+import pandas as pd
+import io
+import matplotlib.pyplot as plt
+```
+<H4>Initialize the input vector and output vector for XOR</H4>
+
+```PYTHON
+x=np.array([[0,0,1,1],[0,1,0,1]])
+y=np.array([[0,1,1,0]]) 
+```
+
+<H4>Initialize the structure of  MLP with input ,hidden  and output layer</H4>
+
+```PYTHON
+# Hyperparameters
+n_x = x.shape[0]  # Number of input features
+n_h = 2  # Number of hidden units
+n_y = y.shape[0]  # Number of output units
+m = x.shape[1]  # Number of training examples
+lr = 0.1  # Learning rate
+iterations = 10000  # Number of iterations
+```
+<H4>Weight matrix for hidden layer randomly</H4>
+
+```PYTHON
+# Weight initialization
+np.random.seed(2)
+w1 = np.random.rand(n_h, n_x)  # Weight matrix for hidden layer
+w2 = np.random.rand(n_y, n_h)  # Weight matrix for output layer
+```
+
+<H4>Loss history</H4>
+
+```PYTHON
+losses = []
+```
+
+<H4>Sigmoid activation function</H4>
+
+```PYTHON
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+```
+
+<H4>Forward propagation</H4>
+
+```PYTHON
+def forward_prop(w1,w2,x):
+    z1 = np.dot(w1,x)
+    a1 = sigmoid(z1)
+    z2 = np.dot(w2,a1)
+    a2 = sigmoid(z2)
+    return z1,a1,z2,a2
+```
+
+<H4>Backpropagation</H4>
+
+```PYTHON
+def back_prop(m, w1, w2, z1, a1, z2, a2, y, x):
+    dz2 = a2 - y  # Derivative of loss w.r.t. z2
+    dw2 = np.dot(dz2, a1.T) / m  # Gradient for w2
+    dz1 = np.dot(w2.T, dz2) * a1 * (1 - a1)  # Derivative of loss w.r.t. z1
+    dw1 = np.dot(dz1, x.T) / m  # Gradient for w1
+    return dz2, dw2, dz1, dw1
+```
+
+<H4>Training the network</H4>
+
+```PYTHON
+for i in range(iterations):
+    z1, a1, z2, a2 = forward_prop(w1, w2, x)  # Forward propagation
+    loss = -(1 / m) * np.sum(y * np.log(a2) + (1 - y) * np.log(1 - a2))  # Compute loss
+    losses.append(loss)
+
+    dz2, dw2, dz1, dw1 = back_prop(m, w1, w2, z1, a1, z2, a2, y, x)  # Backpropagation
+
+    # Update weights using gradients
+    w2 = w2 - lr * dw2
+    w1 = w1 - lr * dw1
+```
+
+<H4>plot losses to see how our network is doing</H4>
+
+```PYTHON
+plt.plot(losses)
+plt.xlabel("EPOCHS")
+plt.ylabel("Loss value")
+plt.show()
+```
+
+<H4>Prediction function</H4>
+
+```PYTHON
+def predict(w1, w2, input):
+    z1, a1, z2, a2 = forward_prop(w1, w2, input)
+    a2 = np.squeeze(a2)
+    if a2 >= 0.5:
+        print([i[0] for i in input], 1)
+    else:
+        print([i[0] for i in input], 0)
+```
+
+<H4>Test predictions</H4>
+
+```PYTHON
+print('Input', 'Output')
+test = np.array([[1], [0]])
+predict(w1, w2, test)
+
+test = np.array([[1], [1]])
+predict(w1, w2, test)
+
+test = np.array([[0], [1]])
+predict(w1, w2, test)
+
+test = np.array([[0], [0]])
+predict(w1, w2, test)
+```
+
 
 <H3>Output:</H3>
 
